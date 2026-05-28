@@ -1,0 +1,44 @@
+name: Deploy to production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Run deploy.sh on server
+        run: |
+          ssh -o StrictHostKeyChecking=accept-new \
+              -i ~/.ssh/id_ed25519 \
+              "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+              "bash ~/vk/deploy.sh"
+
+      - name: Smoke test endpoints
+        run: |
+          set -e
+          PUB="http://${{ secrets.DEPLOY_HOST }}:8000"
+          # API health (may take a few seconds after restart)
+          for i in {1..20}; do
+            if curl -fsS "$PUB/health" >/dev/null; then echo "health OK"; break; fi
+            sleep 2
+          done
+          curl -fsS "$PUB/health/ready" | grep ready
+          curl -s -o /dev/null -w "/docs -> %{http_code}\n" "$PUB/docs" | grep 200
