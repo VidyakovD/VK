@@ -124,7 +124,6 @@ export function Communities({ id, onBack }: Props) {
           id="create-community"
           onClose={() => setModalOpen(false)}
           title="Подключение сообщества"
-          subtitle="В dev-режиме без OAuth — указываешь любой ID и название"
           actions={
             <ButtonGroup mode="vertical" stretched>
               <Button

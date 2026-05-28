@@ -64,7 +64,7 @@ export function App() {
 
   if (authError) {
     return (
-      <Placeholder header="Не удалось войти" action={authError}>
+      <Placeholder title="Не удалось войти" action={authError}>
         Открой Mini App из ВКонтакте, либо в dev-режиме поставь VITE_MOCK_LAUNCH_PARAMS=true.
       </Placeholder>
     );

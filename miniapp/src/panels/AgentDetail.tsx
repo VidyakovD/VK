@@ -186,7 +186,7 @@ function ChatTab({ agentId }: { agentId: string }) {
               <Div>
                 <Header>Источники из базы знаний</Header>
                 {t.sources.map((s, j) => (
-                  <Banner key={j} mode="tint" header={`Релевантность ${s.score.toFixed(2)}`}>
+                  <Banner key={j} mode="tint" title={`Релевантность ${s.score.toFixed(2)}`}>
                     {s.text.slice(0, 200)}
                     {s.text.length > 200 ? "…" : ""}
                   </Banner>
