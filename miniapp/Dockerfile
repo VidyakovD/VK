@@ -12,7 +12,8 @@ ENV VITE_API_URL=$VITE_API_URL \
     VITE_MOCK_LAUNCH_PARAMS=$VITE_MOCK_LAUNCH_PARAMS
 
 COPY package.json package-lock.json* ./
-RUN npm install --no-audit --no-fund
+# --legacy-peer-deps because VKUI ecosystem has stale peer dep ranges across libs
+RUN npm install --no-audit --no-fund --legacy-peer-deps
 
 COPY . .
 RUN npm run build

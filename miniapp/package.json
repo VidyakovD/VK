@@ -14,7 +14,6 @@
   "dependencies": {
     "@vkontakte/icons": "^3.18.0",
     "@vkontakte/vk-bridge": "^3.20.0",
-    "@vkontakte/vk-bridge-react": "^1.1.0",
     "@vkontakte/vk-mini-apps-router": "^2.3.0",
     "@vkontakte/vkui": "^7.7.0",
     "@xyflow/react": "^12.3.0",
