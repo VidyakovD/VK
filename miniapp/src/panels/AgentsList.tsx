@@ -145,7 +145,7 @@ export function AgentsList({ id, onBack, onOpenAgent, onGoToCommunities }: Props
         <ModalCard
           id="create-agent"
           onClose={() => setModalOpen(false)}
-          header="Новый ИИ-агент"
+          title="Новый ИИ-агент"
           icon={<Icon24LogoVk width={56} height={56} />}
           actions={
             <ButtonGroup mode="vertical" stretched>

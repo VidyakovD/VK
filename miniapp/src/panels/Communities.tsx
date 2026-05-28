@@ -123,8 +123,8 @@ export function Communities({ id, onBack }: Props) {
         <ModalCard
           id="create-community"
           onClose={() => setModalOpen(false)}
-          header="Подключение сообщества"
-          subheader="В dev-режиме без OAuth — указываешь любой ID и название"
+          title="Подключение сообщества"
+          subtitle="В dev-режиме без OAuth — указываешь любой ID и название"
           actions={
             <ButtonGroup mode="vertical" stretched>
               <Button
@@ -162,6 +162,7 @@ export function Communities({ id, onBack }: Props) {
       {snack && (
         <Snackbar
           onClose={() => setSnack(null)}
+          onClosed={() => setSnack(null)}
           before={<Icon16Done fill="var(--vkui--color_icon_positive)" />}
         >
           {snack}

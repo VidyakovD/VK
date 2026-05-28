@@ -52,8 +52,8 @@ export function Billing({ id, onBack }: Props) {
           <Group>
             <Banner
               mode="image"
-              header={`${balance?.credits_balance ?? "0"} кредитов`}
-              subheader={
+              title={`${balance?.credits_balance ?? "0"} кредитов`}
+              subtitle={
                 balance?.trial_ends_at
                   ? `Триал до ${new Date(balance.trial_ends_at).toLocaleDateString("ru")}`
                   : "Триал завершён"

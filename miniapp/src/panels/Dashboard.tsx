@@ -11,10 +11,10 @@ import {
   Spinner,
 } from "@vkontakte/vkui";
 import {
-  Icon28ChartOutline,
   Icon28MessageOutline,
   Icon28PictureOutline,
   Icon28RobotOutline,
+  Icon28StatisticsOutline,
   Icon28UsersOutline,
   Icon28WalletOutline,
 } from "@vkontakte/icons";
@@ -82,7 +82,7 @@ export function Dashboard({ id, onNavigate }: Props) {
               Чат-боты
             </SimpleCell>
             <SimpleCell
-              before={<Icon28ChartOutline />}
+              before={<Icon28StatisticsOutline />}
               onClick={() => onNavigate("mailings")}
               subtitle="Скоро"
               style={{ opacity: 0.5 }}

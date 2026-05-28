@@ -184,7 +184,7 @@ function ChatTab({ agentId }: { agentId: string }) {
             </Cell>
             {t.sources && t.sources.length > 0 && (
               <Div>
-                <Header mode="secondary">Источники из базы знаний</Header>
+                <Header>Источники из базы знаний</Header>
                 {t.sources.map((s, j) => (
                   <Banner key={j} mode="tint" header={`Релевантность ${s.score.toFixed(2)}`}>
                     {s.text.slice(0, 200)}
@@ -396,11 +396,11 @@ function HistoryTab({ agentId }: { agentId: string }) {
           </Cell>
           <Div>
             {c.messages.slice(0, 4).map((m, i) => (
-              <Banner key={i} mode="tint" header={m.role === "user" ? "Пользователь" : "Агент"}>
+              <Banner key={i} mode="tint" title={m.role === "user" ? "Пользователь" : "Агент"}>
                 {String(m.content ?? "").slice(0, 200)}
               </Banner>
             ))}
-            {c.messages.length > 4 && <Header mode="tertiary">…ещё {c.messages.length - 4}</Header>}
+            {c.messages.length > 4 && <Header>…ещё {c.messages.length - 4}</Header>}
           </Div>
         </div>
       ))}
