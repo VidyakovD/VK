@@ -91,10 +91,12 @@ class AgentConversation(Base, UUIDPKMixin):
         nullable=False,
         index=True,
     )
-    subscriber_id: Mapped[uuid.UUID] = mapped_column(
+    # Nullable because test-chat from owner (Mini App) has no subscriber attached.
+    # Real subscriber conversations from Callback API always set this.
+    subscriber_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("subscribers.id", ondelete="CASCADE"),
-        nullable=False,
+        nullable=True,
         index=True,
     )
     # [{role, content, timestamp}, ...]
