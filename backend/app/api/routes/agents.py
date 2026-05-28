@@ -7,10 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.dependencies import get_current_user
 from app.core.db import get_session
 from app.models import KnowledgeBaseDocument, User
+from sqlalchemy import select
+
+from app.models import AgentConversation
 from app.schemas import (
     AgentCreate,
     AgentRead,
     AgentUpdate,
+    ConversationRead,
     DocumentRead,
     DocumentUploadFromURL,
     DocumentUploadManual,
@@ -232,6 +236,28 @@ async def delete_kb_document(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
     await delete_document_index(session, doc_id)
     return OkResponse()
+
+
+# --- Conversation history ----------------------------------------------------
+@router.get("/{agent_id}/conversations", response_model=list[ConversationRead])
+async def list_conversations(
+    agent_id: uuid.UUID,
+    limit: int = 50,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> list[ConversationRead]:
+    try:
+        await agent_service.assert_user_owns_agent(session, current_user, agent_id)
+    except PermissionError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    stmt = (
+        select(AgentConversation)
+        .where(AgentConversation.agent_id == agent_id)
+        .order_by(AgentConversation.created_at.desc())
+        .limit(min(limit, 200))
+    )
+    result = await session.execute(stmt)
+    return [ConversationRead.model_validate(c) for c in result.scalars().all()]
 
 
 # Chat endpoint lives in routes/chat.py

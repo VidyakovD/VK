@@ -113,3 +113,18 @@ class ChatResponse(BaseModel):
     provider: str
     fallback_triggered: bool
     conversation_id: uuid.UUID
+
+
+class ConversationRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    agent_id: uuid.UUID
+    subscriber_id: uuid.UUID | None
+    messages: list[dict]
+    tokens_in: int | None
+    tokens_out: int | None
+    credits_spent: Decimal | None
+    status: str
+    created_at: datetime
+    updated_at: datetime

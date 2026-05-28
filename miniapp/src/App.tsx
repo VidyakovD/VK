@@ -1,45 +1,40 @@
 import { useEffect, useState } from "react";
 import {
-  SplitLayout,
-  SplitCol,
-  View,
   Panel,
   PanelHeader,
-  Group,
-  Header,
-  SimpleCell,
-  Spinner,
   Placeholder,
-  Avatar,
-  Cell,
+  SplitCol,
+  SplitLayout,
+  Spinner,
+  View,
 } from "@vkontakte/vkui";
-import {
-  Icon28RobotOutline,
-  Icon28MessageOutline,
-  Icon28ChartOutline,
-  Icon28PictureOutline,
-  Icon28UsersOutline,
-  Icon28WalletOutline,
-} from "@vkontakte/icons";
 
 import { authVK, getMe } from "@/api/client";
 import { useAuthStore } from "@/store/auth";
 import { getLaunchParams } from "@/lib/vkBridge";
 
+import { AgentDetail } from "@/panels/AgentDetail";
+import { AgentsList } from "@/panels/AgentsList";
+import { Billing } from "@/panels/Billing";
+import { Communities } from "@/panels/Communities";
+import { Dashboard } from "@/panels/Dashboard";
+
 type ActivePanel =
   | "dashboard"
   | "communities"
+  | "agents"
+  | "agent_detail"
+  | "billing"
   | "bots"
   | "mailings"
-  | "agents"
-  | "content"
-  | "billing";
+  | "content";
 
 export function App() {
-  const { user, setTokens, setUser } = useAuthStore();
+  const { setTokens, setUser } = useAuthStore();
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const [activePanel, setActivePanel] = useState<ActivePanel>("dashboard");
+  const [openedAgentId, setOpenedAgentId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -70,117 +65,50 @@ export function App() {
   if (authError) {
     return (
       <Placeholder header="Не удалось войти" action={authError}>
-        Открой Mini App из ВКонтакте, либо настрой VITE_MOCK_LAUNCH_PARAMS=true в .env
+        Открой Mini App из ВКонтакте, либо в dev-режиме поставь VITE_MOCK_LAUNCH_PARAMS=true.
       </Placeholder>
     );
+  }
+
+  function openAgent(id: string) {
+    setOpenedAgentId(id);
+    setActivePanel("agent_detail");
   }
 
   return (
     <SplitLayout header={<PanelHeader delimiter="none" />}>
       <SplitCol autoSpaced>
         <View activePanel={activePanel} id="main">
-          <Panel id="dashboard">
-            <PanelHeader>Кабинет</PanelHeader>
-            {user && (
-              <Group>
-                <Cell
-                  before={<Avatar src={user.avatar_url ?? undefined} size={48} />}
-                  subtitle={`Баланс: ${user.credits_balance} кр.`}
-                >
-                  {user.first_name} {user.last_name}
-                </Cell>
-              </Group>
-            )}
-            <Group header={<Header>Модули</Header>}>
-              <SimpleCell
-                before={<Icon28UsersOutline />}
-                onClick={() => setActivePanel("communities")}
-              >
-                Сообщества
-              </SimpleCell>
-              <SimpleCell
-                before={<Icon28MessageOutline />}
-                onClick={() => setActivePanel("bots")}
-              >
-                Чат-боты
-              </SimpleCell>
-              <SimpleCell
-                before={<Icon28ChartOutline />}
-                onClick={() => setActivePanel("mailings")}
-              >
-                Рассылки
-              </SimpleCell>
-              <SimpleCell
-                before={<Icon28RobotOutline />}
-                onClick={() => setActivePanel("agents")}
-              >
-                ИИ-агенты
-              </SimpleCell>
-              <SimpleCell
-                before={<Icon28PictureOutline />}
-                onClick={() => setActivePanel("content")}
-              >
-                Оформление сообщества
-              </SimpleCell>
-              <SimpleCell
-                before={<Icon28WalletOutline />}
-                onClick={() => setActivePanel("billing")}
-              >
-                Баланс и тарифы
-              </SimpleCell>
-            </Group>
-          </Panel>
+          <Dashboard id="dashboard" onNavigate={(p) => setActivePanel(p as ActivePanel)} />
+          <Communities id="communities" onBack={() => setActivePanel("dashboard")} />
+          <AgentsList
+            id="agents"
+            onBack={() => setActivePanel("dashboard")}
+            onOpenAgent={openAgent}
+            onGoToCommunities={() => setActivePanel("communities")}
+          />
+          <AgentDetail
+            id="agent_detail"
+            agentId={openedAgentId ?? ""}
+            onBack={() => setActivePanel("agents")}
+          />
+          <Billing id="billing" onBack={() => setActivePanel("dashboard")} />
 
-          <Panel id="communities">
-            <PanelHeader before={<BackButton onClick={() => setActivePanel("dashboard")} />}>
-              Сообщества
-            </PanelHeader>
-            <Placeholder>Подключение сообществ — в разработке</Placeholder>
-          </Panel>
+          {/* Placeholders for future stages */}
           <Panel id="bots">
-            <PanelHeader before={<BackButton onClick={() => setActivePanel("dashboard")} />}>
-              Чат-боты
-            </PanelHeader>
-            <Placeholder>Нодовый редактор — в разработке</Placeholder>
+            <PanelHeader>Чат-боты</PanelHeader>
+            <Placeholder>Нодовый редактор сценариев — Этап 3 (в разработке)</Placeholder>
           </Panel>
           <Panel id="mailings">
-            <PanelHeader before={<BackButton onClick={() => setActivePanel("dashboard")} />}>
-              Рассылки
-            </PanelHeader>
-            <Placeholder>Рассылки — в разработке</Placeholder>
-          </Panel>
-          <Panel id="agents">
-            <PanelHeader before={<BackButton onClick={() => setActivePanel("dashboard")} />}>
-              ИИ-агенты
-            </PanelHeader>
-            <Placeholder>Создание агента и базы знаний — в разработке</Placeholder>
+            <PanelHeader>Рассылки</PanelHeader>
+            <Placeholder>Сегментированные рассылки — Этап 4 (в разработке)</Placeholder>
           </Panel>
           <Panel id="content">
-            <PanelHeader before={<BackButton onClick={() => setActivePanel("dashboard")} />}>
-              Оформление сообщества
-            </PanelHeader>
-            <Placeholder>Генерация постов и картинок — в разработке</Placeholder>
-          </Panel>
-          <Panel id="billing">
-            <PanelHeader before={<BackButton onClick={() => setActivePanel("dashboard")} />}>
-              Баланс и тарифы
-            </PanelHeader>
-            <Placeholder>Биллинг — в разработке</Placeholder>
+            <PanelHeader>Оформление сообщества</PanelHeader>
+            <Placeholder>Генерация постов, обложек, контент-план — Этап 5 (в разработке)</Placeholder>
           </Panel>
         </View>
       </SplitCol>
     </SplitLayout>
-  );
-}
-
-function BackButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{ background: "none", border: "none", cursor: "pointer", padding: "8px 12px" }}
-      aria-label="Назад"
-    >
-      ←
-    </button>
   );
 }
