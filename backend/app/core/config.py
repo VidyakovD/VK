@@ -1,7 +1,7 @@
 from functools import lru_cache
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import Field, PostgresDsn, RedisDsn
+from pydantic import Field, PostgresDsn, RedisDsn, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -77,6 +77,14 @@ class Settings(BaseSettings):
     # Observability
     sentry_dsn: str | None = None
     prometheus_enabled: bool = True
+
+    @field_validator("vk_app_id", mode="before")
+    @classmethod
+    def _empty_string_as_none(cls, v: Any) -> Any:
+        """Treat empty string env values as None for optional non-string fields."""
+        if isinstance(v, str) and v.strip() == "":
+            return None
+        return v
 
     @property
     def is_production(self) -> bool:
