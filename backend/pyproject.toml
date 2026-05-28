@@ -1,0 +1,112 @@
+[project]
+name = "vk-saas-backend"
+version = "0.1.0"
+description = "Backend for VK SaaS for Entrepreneurs"
+requires-python = ">=3.11"
+
+dependencies = [
+    # Web framework
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.9.0",
+    "pydantic-settings>=2.6.0",
+
+    # Database
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30.0",
+    "alembic>=1.14.0",
+    "psycopg2-binary>=2.9.10",
+
+    # Queue / cache
+    "celery[redis]>=5.4.0",
+    "redis>=5.2.0",
+
+    # Vector DB
+    "qdrant-client>=1.12.0",
+
+    # AI
+    "openai>=1.55.0",
+    "anthropic>=0.40.0",
+    "tiktoken>=0.8.0",
+
+    # Document parsing
+    "pypdf>=5.1.0",
+    "python-docx>=1.1.2",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.3.0",
+
+    # HTTP / VK
+    "httpx>=0.28.0",
+    "tenacity>=9.0.0",
+
+    # Security
+    "pyjwt>=2.10.0",
+    "cryptography>=44.0.0",
+    "passlib[bcrypt]>=1.7.4",
+
+    # S3
+    "boto3>=1.35.0",
+
+    # Observability
+    "sentry-sdk[fastapi]>=2.19.0",
+    "structlog>=24.4.0",
+    "prometheus-fastapi-instrumentator>=7.0.0",
+
+    # Misc
+    "python-multipart>=0.0.20",
+    "email-validator>=2.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=6.0.0",
+    "httpx>=0.28.0",
+    "ruff>=0.8.0",
+    "mypy>=1.13.0",
+    "types-redis>=4.6.0",
+    "factory-boy>=3.3.0",
+    "freezegun>=1.5.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",  # pycodestyle + pyflakes
+    "I",            # isort
+    "B",            # bugbear
+    "UP",           # pyupgrade
+    "N",            # naming
+    "S",            # security (bandit)
+    "C4",           # comprehensions
+    "SIM",          # simplify
+    "PL",           # pylint
+    "RUF",          # ruff-specific
+]
+ignore = [
+    "S101",   # assert allowed in tests
+    "PLR0913", # too many args — fine for FastAPI deps
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "PLR2004"]
+"alembic/*" = ["E501", "N999"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+plugins = ["pydantic.mypy"]
+exclude = ["alembic/versions"]
+
+[[tool.mypy.overrides]]
+module = ["celery.*", "qdrant_client.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --cov=app --cov-report=term-missing"
